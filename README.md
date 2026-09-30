@@ -1,0 +1,1 @@
+# CodeBuddy-Local-Offline-AI-Error-Explainer-and-Fix-Assistant-for-Snapdragon-PCs
