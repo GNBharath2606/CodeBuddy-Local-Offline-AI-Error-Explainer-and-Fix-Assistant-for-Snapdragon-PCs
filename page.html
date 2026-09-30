@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeBuddy Local — Offline AI Error Explainer for Snapdragon PCs</title>
+<style>
+  :root{
+    --bg:#0a0e17; --bg2:#0f1524; --card:#141b2e; --line:#223052;
+    --text:#e8eefc; --muted:#8b99b8; --accent:#4ade80; --accent2:#38bdf8;
+    --grad:linear-gradient(135deg,#4ade80 0%,#38bdf8 100%);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,sans-serif;line-height:1.6;overflow-x:hidden}
+  a{color:var(--accent2);text-decoration:none}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,14,23,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:10px}
+  .logo .dot{width:12px;height:12px;border-radius:50%;background:var(--grad);box-shadow:0 0 14px #4ade80}
+  .navlinks{display:flex;gap:28px;font-size:.92rem}
+  .navlinks a{color:var(--muted);transition:color .2s}
+  .navlinks a:hover{color:var(--text)}
+  .btn{display:inline-block;padding:10px 22px;border-radius:10px;font-weight:600;font-size:.95rem;transition:transform .15s,box-shadow .15s;cursor:pointer;border:none}
+  .btn-primary{background:var(--grad);color:#04121f}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(74,222,128,.35)}
+  .btn-ghost{border:1px solid var(--line);color:var(--text);background:transparent}
+  .btn-ghost:hover{border-color:var(--accent)}
+
+  /* HERO */
+  .hero{padding:150px 0 90px;text-align:center;position:relative}
+  .hero::before{content:"";position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(closest-side,rgba(56,189,248,.12),transparent);pointer-events:none}
+  .badge{display:inline-block;padding:6px 16px;border:1px solid var(--line);border-radius:999px;font-size:.8rem;color:var(--muted);margin-bottom:24px;background:var(--bg2)}
+  .badge b{color:var(--accent)}
+  h1{font-size:clamp(2.2rem,5.5vw,3.8rem);line-height:1.15;font-weight:800;letter-spacing:-1px}
+  h1 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{max-width:640px;margin:22px auto 36px;color:var(--muted);font-size:1.1rem}
+  .hero-cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .stats{display:flex;gap:48px;justify-content:center;margin-top:64px;flex-wrap:wrap}
+  .stat{text-align:center}
+  .stat .num{font-size:1.9rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat .lbl{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+  /* TERMINAL DEMO */
+  .demo{margin:20px auto 0;max-width:760px;background:#05080f;border:1px solid var(--line);border-radius:14px;text-align:left;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .demo-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--line)}
+  .demo-bar span{width:11px;height:11px;border-radius:50%}
+  .demo-bar .r{background:#f87171}.demo-bar .y{background:#fbbf24}.demo-bar .g{background:#4ade80}
+  .demo-bar em{font-style:normal;color:var(--muted);font-size:.8rem;margin-left:8px;font-family:Consolas,monospace}
+  .demo-body{padding:20px 22px;font-family:Consolas,"Courier New",monospace;font-size:.86rem;min-height:200px}
+  .demo-body .err{color:#f87171}
+  .demo-body .ok{color:#4ade80}
+  .demo-body .dim{color:var(--muted)}
+  .demo-body .fix{color:#38bdf8}
+  .caret{display:inline-block;width:8px;height:15px;background:var(--accent);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* SECTIONS */
+  section{padding:90px 0}
+  .alt{background:var(--bg2)}
+  h2{font-size:2rem;font-weight:800;text-align:center;margin-bottom:12px;letter-spacing:-.5px}
+  .lead{text-align:center;color:var(--muted);max-width:600px;margin:0 auto 56px}
+
+  .grid{display:grid;gap:22px}
+  .grid-3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px;transition:transform .2s,border-color .2s}
+  .card:hover{transform:translateY(-4px);border-color:var(--accent)}
+  .card .icon{font-size:1.8rem;margin-bottom:14px}
+  .card h3{font-size:1.1rem;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:.92rem}
+
+  /* HOW IT WORKS */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px;counter-reset:step}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;position:relative}
+  .step::before{counter-increment:step;content:"0" counter(step);position:absolute;top:-14px;left:24px;background:var(--grad);color:#04121f;font-weight:800;font-size:.8rem;padding:4px 12px;border-radius:999px}
+  .step h3{font-size:1rem;margin:10px 0 8px}
+  .step p{color:var(--muted);font-size:.88rem}
+
+  /* STACK TABLE */
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  th,td{padding:14px 18px;text-align:left;font-size:.9rem;border-bottom:1px solid var(--line)}
+  th{background:rgba(74,222,128,.07);color:var(--accent);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+  tr:last-child td{border-bottom:none}
+  td:first-child{color:var(--muted)}
+
+  /* CTA */
+  .cta{text-align:center;padding:100px 24px;background:radial-gradient(ellipse at center,rgba(56,189,248,.1),transparent 70%)}
+  .cta h2{margin-bottom:14px}
+  .cta p{color:var(--muted);margin-bottom:32px}
+
+  footer{border-top:1px solid var(--line);padding:32px 0;text-align:center;color:var(--muted);font-size:.85rem}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  @media(max-width:640px){.navlinks{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo"><span class="dot"></span>CodeBuddy <span style="color:var(--accent)">Local</span></div>
+    <div class="navlinks">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#stack">Tech stack</a>
+      <a href="#download">Download</a>
+    </div>
+    <a href="#download" class="btn btn-primary">Get it free</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="badge">⚡ Built for <b>Snapdragon X Elite &amp; X Plus</b> · Windows on ARM</div>
+    <h1>Your errors, explained.<br><span class="grad">Fully offline. Zero cloud.</span></h1>
+    <p class="sub">CodeBuddy Local is an AI assistant that reads compiler crashes, stack traces and test failures — then explains and fixes them. It runs entirely on your Snapdragon PC using the Hexagon NPU. No account, no network, no code ever leaves your machine.</p>
+    <div class="hero-cta">
+      <a href="#download" class="btn btn-primary">⬇ Download for Windows ARM64</a>
+      <a href="#how" class="btn btn-ghost">See how it works</a>
+    </div>
+
+    <div class="demo">
+      <div class="demo-bar"><span class="r"></span><span class="y"></span><span class="g"></span><em>codebuddy — powershell</em></div>
+      <div class="demo-body" id="terminal"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num">0 ms</div><div class="lbl">Network latency</div></div>
+      <div class="stat"><div class="num">~4.5 GB</div><div class="lbl">RAM footprint</div></div>
+      <div class="stat"><div class="num">38 tok/s</div><div class="lbl">On Hexagon NPU</div></div>
+      <div class="stat"><div class="num">100%</div><div class="lbl">Private</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Why CodeBuddy Local?</h2>
+    <p class="lead">Built for developers who fly, commute, or simply refuse to send proprietary code to someone else's server.</p>
+    <div class="grid grid-3">
+      <div class="card"><div class="icon">🔒</div><h3>Truly offline</h3><p>Airplane mode, basement lab, classified network — CodeBuddy keeps working. Your source code never touches a network socket.</p></div>
+      <div class="card"><div class="icon">⚡</div><h3>NPU-accelerated</h3><p>Quantized models run on the Snapdragon Hexagon NPU via QNN, leaving your CPU free for builds and keeping battery drain minimal.</p></div>
+      <div class="card"><div class="icon">🧠</div><h3>Explains &amp; fixes</h3><p>Not just "what broke" but "why it broke" — with a ranked list of concrete patches you can apply in one click.</p></div>
+      <div class="card"><div class="icon">🪟</div><h3>Native ARM64</h3><p>No x64 emulation tax. A genuine Windows on ARM app that launches in under a second and sips power.</p></div>
+      <div class="card"><div class="icon">🔌</div><h3>IDE &amp; terminal hooks</h3><p>Works from VS Code, JetBrains, or any terminal. Pipe errors in, get fixes out — <code>npm test 2&gt;&amp;1 | codebuddy</code>.</p></div>
+      <div class="card"><div class="icon">🆓</div><h3>Free &amp; open source</h3><p>MIT licensed. Swap in your own fine-tuned model, audit every line, self-host everything.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="alt">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="lead">From red stack trace to green build in four steps.</p>
+    <div class="steps">
+      <div class="step"><h3>Capture</h3><p>A watcher picks up errors from your terminal, build output, or IDE diagnostic stream automatically.</p></div>
+      <div class="step"><h3>Understand</h3><p>A 4-bit quantized coding LLM (Qwen2.5-Coder) reasons over the error plus surrounding file context.</p></div>
+      <div class="step"><h3>Explain</h3><p>Plain-language diagnosis in the bottom panel — root cause, not just the top line of the trace.</p></div>
+      <div class="step"><h3>Fix</h3><p>A diff suggestion you can preview and apply with one click, or copy into your editor.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <h2>Under the hood</h2>
+    <p class="lead">A small, replaceable stack — deliberately boring, deliberately local.</p>
+    <table>
+      <tr><th>Component</th><th>Technology</th><th>Why</th></tr>
+      <tr><td>Runtime</td><td>ONNX Runtime + QNN EP</td><td>Direct Hexagon NPU access on Snapdragon</td></tr>
+      <tr><td>Model</td><td>Qwen2.5-Coder-7B-Instruct (4-bit)</td><td>Strong code reasoning at ~4.5 GB RAM</td></tr>
+      <tr><td>Fallback</td><td>llama.cpp (ARM64 NEON)</td><td>Works on any ARM64 chip without NPU</td></tr>
+      <tr><td>App shell</td><td>C# / WinUI 3</td><td>Native ARM64, modern Windows look</td></tr>
+      <tr><td>IDE hooks</td><td>VS Code extension + CLI</td><td>Meet devs where they already are</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="download" class="cta">
+  <h2>Stop pasting errors into chatbots.</h2>
+  <p>Download CodeBuddy Local for Windows on ARM. MIT licensed — 84 MB installer, model downloads on first launch.</p>
+  <a href="#" class="btn btn-primary" style="font-size:1.05rem;padding:14px 34px">⬇ Download v1.0 (ARM64)</a>
+  <p style="margin-top:18px;font-size:.85rem"><a href="#">GitHub</a> · <a href="#">Documentation</a> · <a href="#">Report an issue</a></p>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 CodeBuddy Local — MIT License</span>
+    <span>Made for Snapdragon PCs · No telemetry, ever.</span>
+  </div>
+</footer>
+
+<script>
+const lines = [
+  {t:"$ python train.py --epochs 10", c:"dim"},
+  {t:"Traceback (most recent call last):", c:"err"},
+  {t:"  File \"train.py\", line 42, in <module>", c:"dim"},
+  {t:"    loss.backward()", c:"dim"},
+  {t:"RuntimeError: CUDA error: device-side assert triggered", c:"err"},
+  {t:"", c:"dim"},
+  {t:"✦ CodeBuddy is analyzing... (offline, NPU)", c:"fix"},
+  {t:"", c:"dim"},
+  {t:"✔ Root cause: label index 10 out of range for 10-class output.", c:"ok"},
+  {t:"  Your classes are 0–9 but one label equals 10 — likely an off-by-one", c:"ok"},
+  {t:"  in the dataset mapping at data/loader.py:87.", c:"ok"},
+  {t:"", c:"dim"},
+  {t:"✔ Fix: change `label = int(row[1])` to `label = int(row[1]) - 1`", c:"fix"},
+  {t:"✔ Apply patch? [Y/n] Y  →  rebuilt. Run again? [Y/n] ", c:"dim", caret:true},
+];
+const term = document.getElementById("terminal");
+let i = 0;
+function next(){
+  if(i >= lines.length){ setTimeout(()=>{term.innerHTML=""; i=0; next();}, 6000); return; }
+  const l = lines[i++];
+  const div = document.createElement("div");
+  div.className = l.c;
+  div.textContent = l.t || " ";
+  if(l.caret){ const c=document.createElement("span"); c.className="caret"; div.appendChild(c); }
+  term.appendChild(div);
+  setTimeout(next, l.c==="err" ? 350 : 500);
+}
+next();
+</script>
+</body>
+</html>
